@@ -8,6 +8,7 @@ namespace FutsalManager.Domain.Entity
 {
     public class Team
     {
+        public string Id { get; set; }
         public string Name { get; set; }
         public IList<Player> Players { get; set; }
 

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FutsalManager.Domain.Exceptions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,13 +9,37 @@ namespace FutsalManager.Domain.Entity
 {
     public class Match
     {
+        public string Id { get; set; }
         public Team HomeTeam { get; set; }
         public Team AwayTeam { get; set; }
+
+        private List<Score> Scores { get; set; }
+
+        private IReadOnlyList<Score> ScoreList
+        {
+            get
+            {
+                return Scores;
+            }
+        }
 
         public Match(Team home, Team away)
         {
             HomeTeam = home;
             AwayTeam = away;
+
+            Scores = new List<Score>();
+        }
+
+        public void AddScore(Team scoredTeam, Player player, string remark = "")
+        {
+            Scores.Add(
+                new Score 
+                {
+                    Team = scoredTeam,
+                    Scorer = player,
+                    Remark = remark
+                });
         }
     }
 }

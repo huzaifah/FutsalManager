@@ -74,14 +74,14 @@ namespace FutsalManager.Domain.Test
         {
             var tournament = new Tournament(new DateTime(2015, 5, 5), 4, 6);
             tournamentService.CreateTournament(tournament);
-
-            tournamentService.AddTeam(tournament, new Team("Blue"));
-            tournamentService.AssignPlayer(tournament, "Blue", new Player("Ali"));
-            tournamentService.AssignPlayer(tournament, "Blue", new Player("Rafiq"));
-            tournamentService.AssignPlayer(tournament, "Blue", new Player("Nathan"));
-            tournamentService.AssignPlayer(tournament, "Blue", new Player("Jon"));
-            tournamentService.AssignPlayer(tournament, "Blue", new Player("Bass"));
-            tournamentService.AssignPlayer(tournament, "Blue", new Player("Geoff"));
+            var team = new Team("Blue");
+            tournamentService.AddTeam(tournament, team);
+            tournamentService.AssignPlayer(tournament, team, new Player("Ali"));
+            tournamentService.AssignPlayer(tournament, team, new Player("Rafiq"));
+            tournamentService.AssignPlayer(tournament, team, new Player("Nathan"));
+            tournamentService.AssignPlayer(tournament, team, new Player("Jon"));
+            tournamentService.AssignPlayer(tournament, team, new Player("Bass"));
+            tournamentService.AssignPlayer(tournament, team, new Player("Geoff"));
 
             Assert.IsTrue(tournament.TeamList[0].Players.Count == 6);
         }
@@ -93,7 +93,7 @@ namespace FutsalManager.Domain.Test
             tournamentService.CreateTournament(tournament);
 
             tournamentService.AddTeam(tournament, new Team("Blue"));
-            tournamentService.AssignPlayer(tournament, "Grey", new Player("Ali"));
+            tournamentService.AssignPlayer(tournament, new Team("Grey"), new Player("Ali"));
         }
 
         [TestMethod]
@@ -102,10 +102,13 @@ namespace FutsalManager.Domain.Test
             var tournament = new Tournament(new DateTime(2015, 5, 5), 4, 6);
             tournamentService.CreateTournament(tournament);
 
-            tournamentService.AddTeam(tournament, new Team("Blue"));
-            tournamentService.AddTeam(tournament, new Team("White"));
+            var blue = new Team("Blue");
+            var white = new Team("White");
 
-            tournamentService.AddMatch(tournament, "Blue", "White");
+            tournamentService.AddTeam(tournament, blue);
+            tournamentService.AddTeam(tournament, white);
+
+            tournamentService.AddMatch(tournament, blue, white);
         }
 
         [TestMethod, ExpectedException(typeof(TeamNotFoundException))]
@@ -114,9 +117,10 @@ namespace FutsalManager.Domain.Test
             var tournament = new Tournament(new DateTime(2015, 5, 5), 4, 6);
             tournamentService.CreateTournament(tournament);
 
-            tournamentService.AddTeam(tournament, new Team("Blue"));
+            var blue = new Team("Blue");
+            tournamentService.AddTeam(tournament, blue);
 
-            tournamentService.AddMatch(tournament, "Blue", "White");
+            tournamentService.AddMatch(tournament, blue, new Team("White"));
         }
 
         [TestMethod]
@@ -137,5 +141,25 @@ namespace FutsalManager.Domain.Test
             Assert.IsTrue(tournament.Date == tournamentDate);
         }
 
+        [TestMethod]
+        public void AddScore_ValidMatch_SaveScore()
+        {
+            var tournamentDate = new DateTime(2015, 1, 1);
+            var tournament = tournamentService.RetrieveTournamentByDate(tournamentDate);
+
+            var home = new Team("Blue");
+            var away = new Team("White");
+
+            tournamentService.AddTeam(tournament, home);
+            tournamentService.AddTeam(tournament, away);
+
+            tournamentService.AddMatch(tournament, home, away);
+
+            tournamentService.AssignPlayer(tournament, home, new Player("Ali"));
+
+            var match = tournament.MatchList[home.Name + "v" + away.Name];
+
+            tournamentService.AddScore(tournament, match, home, "Ali");
+        }
     }
 }

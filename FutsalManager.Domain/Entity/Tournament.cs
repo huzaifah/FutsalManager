@@ -8,6 +8,7 @@ namespace FutsalManager.Domain.Entity
 {
     public class Tournament
     {
+        public string Id { get; set; }
         public DateTime Date { get; set; }
         public int TotalTeam { get; set; }
         public int MaxPlayerPerTeam { get; set; }
@@ -42,7 +43,8 @@ namespace FutsalManager.Domain.Entity
 
         public Tournament()
         {
-
+            Teams = new List<Team>();
+            Matches = new Dictionary<string, Match>();
         }
 
         public void AddTeam(Team team)

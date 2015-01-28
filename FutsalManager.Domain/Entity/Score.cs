@@ -6,14 +6,15 @@ using System.Threading.Tasks;
 
 namespace FutsalManager.Domain.Entity
 {
-    public class Player
+    public class Score
     {
-        public string Id { get; set; }
-        public string Name { get; set; }
-
-        public Player(string name)
+        public Team Team { get; set; }
+        public Player Scorer { get; set; }
+        public string Remark { get; set; }
+    
+        public Score()
         {
-            Name = name;
+
         }
     }
 }

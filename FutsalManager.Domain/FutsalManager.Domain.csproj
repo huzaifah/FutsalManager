@@ -41,9 +41,11 @@
   <ItemGroup>
     <Compile Include="Entity\Match.cs" />
     <Compile Include="Entity\Player.cs" />
+    <Compile Include="Entity\Score.cs" />
     <Compile Include="Entity\Team.cs" />
     <Compile Include="Entity\Tournament.cs" />
     <Compile Include="Exceptions\ExceedTotalTeamsException.cs" />
+    <Compile Include="Exceptions\PlayerNotFoundException.cs" />
     <Compile Include="Exceptions\TeamNotFoundException.cs" />
     <Compile Include="Interfaces\ITournamentRepository.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
