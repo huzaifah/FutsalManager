@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using FutsalManager.Domain.Interfaces;
 using FakeItEasy;
+using FutsalManager.Domain.Enum;
 
 namespace FutsalManager.Domain.Test
 {
@@ -29,9 +30,57 @@ namespace FutsalManager.Domain.Test
             A.CallTo(() => tournamentRepo.GetByDate(new DateTime(2015, 1, 1)))
                 .Returns(new Tournament
                 {
+                    Id = "1",
                     Date = new DateTime(2015, 1, 1),
                     MaxPlayerPerTeam = 6,
                     TotalTeam = 4                    
+                });
+
+            var blue = new Team { Name = "Blue", Id="4" };
+            var white = new Team("White");
+
+            A.CallTo(() => tournamentRepo.GetTeamsByTournament("1"))
+                .Returns(new List<Team>
+                {
+                    blue,
+                    white
+                });
+
+            A.CallTo(() => tournamentRepo.GetTeamsByTournament("2"))
+                .Returns(new List<Team>
+                {
+                    blue,
+                    white
+                });
+
+            A.CallTo(() => tournamentRepo.GetTotalTeamsByTournament("1"))
+                .Returns(5);
+
+            A.CallTo(() => tournamentRepo.GetTotalTeamsByTournament("2"))
+                .Returns(3);
+
+            A.CallTo(() => tournamentRepo.GetMatches("2"))
+                .Returns(new List<Match>
+                {
+                    new Match(blue, white)
+                });
+
+            A.CallTo(() => tournamentRepo.GetPlayersByTeam("2", "4"))
+                .Returns(new List<Player>
+                {
+                    new Player { Id = "3", Name = "Ali" },
+                    new Player { Id = "4", Name = "Rafiq" },
+                    new Player { Id = "5", Name = "Nathan" },
+                    new Player { Id = "6", Name = "Jon" },
+                    new Player { Id = "7", Name = "Bass" },
+                    new Player { Id = "8", Name = "Geoff" }
+                });
+
+            A.CallTo(() => tournamentRepo.GetPlayerById("3"))
+                .Returns(new Player 
+                {
+                    Id = "3",
+                    Name = "Ali"
                 });
 
             tournamentService = new TournamentService(tournamentRepo);
@@ -48,6 +97,7 @@ namespace FutsalManager.Domain.Test
         public void AddTeam_ExceedLimit_ThrowsException()
         {
             var tournament = new Tournament(new DateTime(2015, 5, 5), 4, 8);
+            tournament.Id = "1";
             tournamentService.CreateTournament(tournament);
 
             tournamentService.AddTeam(tournament, new Team("Blue"));
@@ -62,6 +112,7 @@ namespace FutsalManager.Domain.Test
         {
             var tournament = new Tournament(new DateTime(2015, 5, 5), 4, 8);
             tournamentService.CreateTournament(tournament);
+            tournament.Id = "2";
 
             tournamentService.AddTeam(tournament, new Team("Blue"));
             tournamentService.AddTeam(tournament, new Team("Black"));
@@ -73,9 +124,10 @@ namespace FutsalManager.Domain.Test
         public void AssignPlayer_WithinLimit_PlayerAdded()
         {
             var tournament = new Tournament(new DateTime(2015, 5, 5), 4, 6);
-            tournamentService.CreateTournament(tournament);
-            var team = new Team("Blue");
-            tournamentService.AddTeam(tournament, team);
+            tournament.Id = "2";
+
+            var team = tournamentService.RetrieveTeams(tournament).FirstOrDefault(x => x.Name == "Blue");
+
             tournamentService.AssignPlayer(tournament, team, new Player("Ali"));
             tournamentService.AssignPlayer(tournament, team, new Player("Rafiq"));
             tournamentService.AssignPlayer(tournament, team, new Player("Nathan"));
@@ -83,7 +135,8 @@ namespace FutsalManager.Domain.Test
             tournamentService.AssignPlayer(tournament, team, new Player("Bass"));
             tournamentService.AssignPlayer(tournament, team, new Player("Geoff"));
 
-            Assert.IsTrue(tournament.TeamList[0].Players.Count == 6);
+            var playerList = tournamentService.RetrievePlayers(tournament, team);
+            Assert.IsTrue(playerList.Count() == 6);
         }
 
         [TestMethod, ExpectedException(typeof(TeamNotFoundException))]
@@ -100,14 +153,10 @@ namespace FutsalManager.Domain.Test
         public void CreateMatch_ValidTeam_MatchCreated()
         {
             var tournament = new Tournament(new DateTime(2015, 5, 5), 4, 6);
-            tournamentService.CreateTournament(tournament);
-
-            var blue = new Team("Blue");
-            var white = new Team("White");
-
-            tournamentService.AddTeam(tournament, blue);
-            tournamentService.AddTeam(tournament, white);
-
+            tournament.Id = "1";
+            var blue = tournamentService.RetrieveTeams(tournament).FirstOrDefault(x => x.Name == "Blue");
+            var white = tournamentService.RetrieveTeams(tournament).FirstOrDefault(x => x.Name == "White");
+            
             tournamentService.AddMatch(tournament, blue, white);
         }
 
@@ -146,20 +195,12 @@ namespace FutsalManager.Domain.Test
         {
             var tournamentDate = new DateTime(2015, 1, 1);
             var tournament = tournamentService.RetrieveTournamentByDate(tournamentDate);
+            tournament.Id = "2";
 
-            var home = new Team("Blue");
-            var away = new Team("White");
+            var matches = tournamentService.RetrieveMatches(tournament);
+            var match = matches.FirstOrDefault(x => x.HomeTeam.Name == "Blue" && x.AwayTeam.Name == "White");
 
-            tournamentService.AddTeam(tournament, home);
-            tournamentService.AddTeam(tournament, away);
-
-            tournamentService.AddMatch(tournament, home, away);
-
-            tournamentService.AssignPlayer(tournament, home, new Player("Ali"));
-
-            var match = tournament.MatchList[home.Name + "v" + away.Name];
-
-            tournamentService.AddScore(tournament, match, home, "Ali");
+            tournamentService.AddScore(tournament, match, TeamSide.Home, "3");
         }
     }
 }

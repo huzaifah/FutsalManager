@@ -12,6 +12,8 @@ namespace FutsalManager.Domain.Entity
         public DateTime Date { get; set; }
         public int TotalTeam { get; set; }
         public int MaxPlayerPerTeam { get; set; }
+        
+        /*        
         private List<Team> Teams { get; set; }
 
         public IReadOnlyList<Team> TeamList
@@ -31,22 +33,24 @@ namespace FutsalManager.Domain.Entity
                 return Matches;
             }
         }
+         */
 
         public Tournament(DateTime tournamentDate, int totalTeam, int maxPlayerPerTeam)
         {
             Date = tournamentDate;
             TotalTeam = totalTeam;
             MaxPlayerPerTeam = maxPlayerPerTeam;
-            Teams = new List<Team>();
-            Matches = new Dictionary<string, Match>();
+            //Teams = new List<Team>();
+            //Matches = new Dictionary<string, Match>();
         }
 
         public Tournament()
         {
-            Teams = new List<Team>();
-            Matches = new Dictionary<string, Match>();
+            //Teams = new List<Team>();
+            //Matches = new Dictionary<string, Match>();
         }
 
+        /*
         public void AddTeam(Team team)
         {
             Teams.Add(team);
@@ -57,5 +61,6 @@ namespace FutsalManager.Domain.Entity
             var key = String.Format("{0}v{1}", match.HomeTeam.Name, match.AwayTeam.Name);
             Matches.Add(key, match);
         }
+         */
     }
 }

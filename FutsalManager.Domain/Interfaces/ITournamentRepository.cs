@@ -13,9 +13,15 @@ namespace FutsalManager.Domain.Interfaces
         Tournament GetByDate(DateTime tournamentDate);
         void Add(Tournament tournament);
         Player GetPlayerByName(string playerName);
+        Player GetPlayerById(string playerId);
         void AddTeam(string tournamentId, Team team);
         void AddPlayer(string tournamentId, string teamId, Player player);
-        void AddMatch(string tournamentId, string homeTeamId, string awayTeamId);
+        void AddMatch(string tournamentId, Match match);
         void AddMatchScore(string tournamentId, string matchId, string teamId, string playerId);
+        IEnumerable<Team> GetTeamsByTournament(string tournamentId);
+        int GetTotalTeamsByTournament(string tournamentId);
+        IEnumerable<Player> GetPlayersByTeam(string tournamentId, string teamId);
+        int GetTotalPlayerByTeam(string tournamentId, string teamId);
+        IEnumerable<Match> GetMatches(string tournamentId);
     }
 }

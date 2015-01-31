@@ -1,4 +1,5 @@
 ﻿using FutsalManager.Domain.Entity;
+using FutsalManager.Domain.Enum;
 using FutsalManager.Domain.Exceptions;
 using FutsalManager.Domain.Interfaces;
 using System;
@@ -25,31 +26,46 @@ namespace FutsalManager.Domain
 
         public void AddTeam(Tournament tournament, Team team)
         {
-            if (tournament.TeamList.Count >= tournament.TotalTeam)
-                throw new ExceedTotalTeamsException();
+            var teamCount = tournamentRepo.GetTotalTeamsByTournament(tournament.Id);
 
-            tournament.AddTeam(team);
+            if (teamCount >= tournament.TotalTeam)
+                throw new ExceedTotalTeamsException();
+                        
             tournamentRepo.AddTeam(tournament.Id, team);
         }
 
         public void AssignPlayer(Tournament tournament, Team team, Player player)
         {
-            if (!tournament.TeamList.Contains(team))
+            var teamList = RetrieveTeams(tournament);
+
+            if (!teamList.Contains(team))
                 throw new TeamNotFoundException();
 
-            team.Players.Add(player);
             tournamentRepo.AddPlayer(tournament.Id, team.Id, player);
         }
 
         public void AddMatch(Tournament tournament, Team home, Team away)
         {
-            if (!tournament.TeamList.Contains(home) || !tournament.TeamList.Contains(away))
+            var teamList = RetrieveTeams(tournament);
+
+            if (!teamList.Contains(home) || !teamList.Contains(away))
                 throw new TeamNotFoundException();
 
             var match = new Match(home, away);
+                        
+            tournamentRepo.AddMatch(tournament.Id, match);
+        }
 
-            tournament.AddMatch(match);
-            tournamentRepo.AddMatch(tournament.Id, home.Id, away.Id);
+        public void AddMatch(Tournament tournament, Match match)
+        {
+            var teamList = RetrieveTeams(tournament);
+
+            if (teamList.FirstOrDefault(x => x.Name == match.HomeTeam.Name)!=null
+                || 
+                teamList.FirstOrDefault(x => x.Name == match.AwayTeam.Name)!=null)
+                throw new TeamNotFoundException();
+
+            tournamentRepo.AddMatch(tournament.Id, match);
         }
 
         public IEnumerable<Tournament> RetrieveTournament()
@@ -64,18 +80,35 @@ namespace FutsalManager.Domain
             return tournament;
         }
 
-        public void AddScore(Tournament tournament, Match match, Team scoredTeam, string scorerName, string remark = "")
+        public void AddScore(Tournament tournament, Match match, TeamSide scoredSide, string playerId, string remark = "")
         {
-            var player = scoredTeam.Players.SingleOrDefault(x => x.Name == scorerName);
+            var scoredTeam = scoredSide == TeamSide.Home ? match.HomeTeam : match.AwayTeam;
+
+            var playerList = tournamentRepo.GetPlayersByTeam(tournament.Id, scoredTeam.Id);
+            var player = playerList.SingleOrDefault(x => x.Id == playerId);
 
             if (player == null)
                 if (String.IsNullOrEmpty(remark))
                     throw new PlayerNotFoundException();
                 else
-                    player = tournamentRepo.GetPlayerByName(scorerName);
+                    player = tournamentRepo.GetPlayerById(playerId);
 
-            match.AddScore(scoredTeam, player, remark);
             tournamentRepo.AddMatchScore(tournament.Id, match.Id, scoredTeam.Id, player.Id);
+        }
+
+        public IEnumerable<Player> RetrievePlayers(Tournament tournament, Team team)
+        {
+            return tournamentRepo.GetPlayersByTeam(tournament.Id, team.Id);
+        }
+
+        public IEnumerable<Match> RetrieveMatches(Tournament tournament)
+        {
+            return tournamentRepo.GetMatches(tournament.Id);
+        }
+
+        public IEnumerable<Team> RetrieveTeams(Tournament tournament)
+        {
+            return tournamentRepo.GetTeamsByTournament(tournament.Id);
         }
 
     }

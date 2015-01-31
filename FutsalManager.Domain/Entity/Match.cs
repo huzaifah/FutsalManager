@@ -10,9 +10,11 @@ namespace FutsalManager.Domain.Entity
     public class Match
     {
         public string Id { get; set; }
+        public string TournamentId { get; set; }
         public Team HomeTeam { get; set; }
         public Team AwayTeam { get; set; }
 
+        /*
         private List<Score> Scores { get; set; }
 
         private IReadOnlyList<Score> ScoreList
@@ -22,15 +24,17 @@ namespace FutsalManager.Domain.Entity
                 return Scores;
             }
         }
+        */
 
         public Match(Team home, Team away)
         {
             HomeTeam = home;
             AwayTeam = away;
 
-            Scores = new List<Score>();
+            //Scores = new List<Score>();
         }
 
+        /*
         public void AddScore(Team scoredTeam, Player player, string remark = "")
         {
             Scores.Add(
@@ -41,5 +45,6 @@ namespace FutsalManager.Domain.Entity
                     Remark = remark
                 });
         }
+         */
     }
 }

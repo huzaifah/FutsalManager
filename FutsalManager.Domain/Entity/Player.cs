@@ -10,6 +10,13 @@ namespace FutsalManager.Domain.Entity
     {
         public string Id { get; set; }
         public string Name { get; set; }
+        public string TeamId { get; set; }
+        public string TournamentId { get; set; }
+
+        public Player()
+        {
+
+        }
 
         public Player(string name)
         {
