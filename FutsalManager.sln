@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FutsalManager.Domain.Test",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FutsalManager.Persistence", "FutsalManager.Persistence\FutsalManager.Persistence.csproj", "{E4C7A604-5761-47A4-AAA7-6A18E6047903}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FutsalManager.Persistence.Test", "FutsalManager.Persistence.Test\FutsalManager.Persistence.Test.csproj", "{B7360FCD-12BC-46EA-AF08-7F5BBF5D64B4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{E4C7A604-5761-47A4-AAA7-6A18E6047903}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E4C7A604-5761-47A4-AAA7-6A18E6047903}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E4C7A604-5761-47A4-AAA7-6A18E6047903}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B7360FCD-12BC-46EA-AF08-7F5BBF5D64B4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B7360FCD-12BC-46EA-AF08-7F5BBF5D64B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B7360FCD-12BC-46EA-AF08-7F5BBF5D64B4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B7360FCD-12BC-46EA-AF08-7F5BBF5D64B4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
