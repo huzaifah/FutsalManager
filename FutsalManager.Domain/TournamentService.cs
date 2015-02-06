@@ -1,6 +1,7 @@
 ﻿using FutsalManager.Domain.Entity;
 using FutsalManager.Domain.Enum;
 using FutsalManager.Domain.Exceptions;
+using FutsalManager.Domain.Helpers;
 using FutsalManager.Domain.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -21,7 +22,7 @@ namespace FutsalManager.Domain
 
         public void CreateTournament(Tournament tournament)
         {
-            tournamentRepo.Add(tournament);
+            tournamentRepo.Add(tournament.ConvertToDto());
         }
 
         public void AddTeam(Tournament tournament, Team team)
@@ -41,7 +42,7 @@ namespace FutsalManager.Domain
             if (!teamList.Contains(team))
                 throw new TeamNotFoundException();
 
-            tournamentRepo.AddPlayer(tournament.Id, team.Id, player);
+            tournamentRepo.AddPlayer(tournament.Id, team.Id, player.ConvertToDto());
         }
 
         public void AddMatch(Tournament tournament, Team home, Team away)
@@ -71,13 +72,14 @@ namespace FutsalManager.Domain
         public IEnumerable<Tournament> RetrieveTournament()
         {
             var tournamentList = tournamentRepo.GetAll();
-            return tournamentList;
+            var tournaments = tournamentList.ToList().ConvertAll(t => t.ConvertToEntity());
+            return tournaments;
         }
 
         public Tournament RetrieveTournamentByDate(DateTime tournamentDate)
         {
             var tournament = tournamentRepo.GetByDate(tournamentDate);
-            return tournament;
+            return tournament.ConvertToEntity();
         }
 
         public void AddScore(Tournament tournament, Match match, TeamSide scoredSide, string playerId, string remark = "")
@@ -98,7 +100,8 @@ namespace FutsalManager.Domain
 
         public IEnumerable<Player> RetrievePlayers(Tournament tournament, Team team)
         {
-            return tournamentRepo.GetPlayersByTeam(tournament.Id, team.Id);
+            var players = tournamentRepo.GetPlayersByTeam(tournament.Id, team.Id);
+            return players.ToList().ConvertAll(player => player.ConvertToEntity());
         }
 
         public IEnumerable<Match> RetrieveMatches(Tournament tournament)

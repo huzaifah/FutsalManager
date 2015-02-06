@@ -1,5 +1,7 @@
-﻿using FutsalManager.Domain.Interfaces;
+﻿using FutsalManager.Domain.Dtos;
+using FutsalManager.Domain.Interfaces;
 using FutsalManager.Persistence.Entities;
+using FutsalManager.Persistence.Helpers;
 using SQLite;
 using System;
 using System.Collections.Generic;
@@ -23,21 +25,21 @@ namespace FutsalManager.Persistence
             db.CreateTable<Tournament>();
         }
 
-        public IEnumerable<Tournament> GetAll()
+        public IEnumerable<TournamentDto> GetAll()
         {
-            var tournamentList = db.Query<Tournament>("Select * from Tournament");
-            return tournamentList;            
+            var tournaments = db.Query<Tournament>("Select * from Tournament");
+            return tournaments.ConvertAll(t => t.ConvertToDto());            
         }
 
-        public Tournament GetByDate(DateTime tournamentDate)
+        public TournamentDto GetByDate(DateTime tournamentDate)
         {
             var tournament = db.Table<Tournament>().FirstOrDefault(x => x.Date == tournamentDate);
-            return tournament;
+            return tournament.ConvertToDto();
         }
 
-        public void Add(Tournament tournament)
+        public void Add(TournamentDto tournament)
         {
-            db.Insert(tournament);
+            db.Insert(tournament.ConvertToDb(), typeof(Tournament));
         }
 
         /*

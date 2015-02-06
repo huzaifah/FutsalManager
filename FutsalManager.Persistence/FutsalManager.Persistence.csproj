@@ -33,9 +33,8 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="SQLite, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\Debug\SQLite.dll</HintPath>
+    <Reference Include="SQLite">
+      <HintPath>SQLiteNetLibrary\SQLite.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -47,6 +46,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Entities\Tournament.cs" />
+    <Compile Include="Helpers\DbMapper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TournamentRepository.cs" />
   </ItemGroup>

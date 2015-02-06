@@ -13,6 +13,7 @@ namespace FutsalManager.Domain.Entity
         public string TournamentId { get; set; }
         public Team HomeTeam { get; set; }
         public Team AwayTeam { get; set; }
+        public bool IsCompleted { get; set; }
 
         /*
         private List<Score> Scores { get; set; }
