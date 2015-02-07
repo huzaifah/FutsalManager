@@ -1,4 +1,5 @@
 ﻿using FutsalManager.Domain.Dtos;
+using FutsalManager.Domain.Exceptions;
 using FutsalManager.Domain.Interfaces;
 using FutsalManager.Persistence.Entities;
 using FutsalManager.Persistence.Helpers;
@@ -11,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace FutsalManager.Persistence
 {
-    public class TournamentRepository
+    public class TournamentRepository : ITournamentRepository
     {
         private readonly SQLiteConnection db;
 
@@ -60,13 +61,13 @@ namespace FutsalManager.Persistence
             if (!Guid.TryParse(playerId, out playerGuid))
                 throw new ArgumentException("Player id is invalid");
             
-            var player = db.Table<Players>().Where(p => p.Id == playerGuid).SingleOrDefault();
+            var player = db.Table<Players>().Where(p => p.Id == playerGuid).Single();
             return player.ConvertToDto();
         }
 
         public PlayerDto GetPlayerById(Guid playerGuid)
         {
-            var player = db.Table<Players>().Where(p => p.Id == playerGuid).SingleOrDefault();
+            var player = db.Table<Players>().Where(p => p.Id == playerGuid).Single();
             return player.ConvertToDto();
         }
 
@@ -119,22 +120,142 @@ namespace FutsalManager.Persistence
             if (Guid.TryParse(tournamentId, out tournamentGuid) && Guid.TryParse(teamId, out teamGuid))
                 throw new ArgumentException("Tournament id or team id is invalid");
 
-            return db.Table<PlayerAssignments>().Where(x => x.TournamentId == tournamentGuid && x.TeamId == teamGuid).Count();
+            return db.Table<PlayerAssignments>().Count(x => x.TournamentId == tournamentGuid && x.TeamId == teamGuid);
+        }
+
+        public string AddEditTeam(TeamDto team)
+        {
+            if (!String.IsNullOrEmpty(team.Id))
+            {   
+                team.Id = Guid.NewGuid().ToString();
+                db.Insert(new Teams { Id = Guid.NewGuid(), Name = team.Name }, typeof(Teams));
+            }
+            else
+            {
+                db.Update(team.ConvertToDb(), typeof(Teams));
+            }
+
+            return team.Id;
+        }
+
+        public void AssignTeam(string tournamentId, TeamDto team)
+        {
+            Guid teamGuid;
+
+            if (!Guid.TryParse(team.Id, out teamGuid))
+                throw new ArgumentException("Team id is invalid");
+
+            if (GetTeamById(teamGuid) == null)
+                throw new TeamNotFoundException();
+
+            Guid tournamentGuid;
+
+            if (!Guid.TryParse(tournamentId, out tournamentGuid))
+                throw new ArgumentException("Tournament id is invalid");
+
+            db.Insert(new TeamAssignments { TeamId = teamGuid, TournamentId = tournamentGuid }, typeof(TeamAssignments));
+        }
+
+        public TeamDto GetTeamByName(string teamName)
+        {
+            var team = db.Table<Teams>().First(t => t.Name == teamName);
+            return team.ConvertToDto();
+        }
+
+        public TeamDto GetTeamById(Guid teamId)
+        {
+            var team = db.Table<Teams>().First(t => t.Id == teamId);
+            return team.ConvertToDto();
+        }
+
+        public IEnumerable<TeamDto> GetTeamsByTournament(string tournamentId)
+        {
+            Guid tournamentGuid;
+
+            if (!Guid.TryParse(tournamentId, out tournamentGuid))
+                throw new ArgumentException("Tournament id is invalid");
+
+            var teams = db.Table<TeamAssignments>().Where(x => x.TournamentId == tournamentGuid);
+
+            IEnumerable<TeamDto> teamsWithNames = null;
+            
+            if (teams.Any())
+            {
+                teamsWithNames = teams.ToList().ConvertAll(team =>
+                    new TeamDto
+                    {
+                        Id = team.TeamId.ToString(),
+                        Name = GetTeamById(team.TeamId).Name,
+                        TournamentId = team.TournamentId.ToString()
+                    });
+            }
+
+            return teamsWithNames;
+        }
+
+        public int GetTotalTeamsByTournament(string tournamentId)
+        {
+            Guid tournamentGuid;
+
+            if (!Guid.TryParse(tournamentId, out tournamentGuid))
+                throw new ArgumentException("Tournament id is invalid");
+
+            return db.Table<TeamAssignments>().Count(x => x.TournamentId == tournamentGuid);
+        }
+
+        public string AddMatch(string tournamentId, MatchDto match)
+        {
+            var matchToSave = match.ConvertToDb();
+
+            if (String.IsNullOrEmpty(match.Id))
+                matchToSave.Id = Guid.NewGuid();
+
+            db.Insert(matchToSave, typeof(Matchs));
+
+            return matchToSave.Id.ToString();
+        }
+
+        public IEnumerable<MatchDto> GetMatches(string tournamentId)
+        {
+            Guid tournamentGuid;
+
+            if (!Guid.TryParse(tournamentId, out tournamentGuid))
+                throw new ArgumentException("Tournament id is invalid");
+
+            var matches = db.Table<Matchs>().Where(m => m.TournamentId == tournamentGuid);
+
+            return matches.ToList().ConvertAll(m => m.ConvertToDto());
+        }
+
+        public void AddMatchScore(string tournamentId, string matchId, string teamId, string playerId, string remark = "")
+        {
+            var score = new Scores
+            {
+                TournamentId = Guid.Parse(tournamentId),
+                MatchId = Guid.Parse(matchId),
+                TeamId = Guid.Parse(teamId),
+                PlayerId = Guid.Parse(playerId),
+                Remark = remark
+            };
+
+            db.Insert(score, typeof(Scores));
         }
 
         /*
-        IEnumerable<Tournament> GetAll();
-        Tournament GetByDate(DateTime tournamentDate);
-        void Add(Tournament tournament);
-        Player GetPlayerByName(string playerName);
-        Player GetPlayerById(string playerId);
-        void AddTeam(string tournamentId, Team team);
-        void AddPlayer(string tournamentId, string teamId, Player player);
-        void AddMatch(string tournamentId, Match match);
+        IEnumerable<TournamentDto> GetAll();
+        TournamentDto GetByDate(DateTime tournamentDate);
+        string Add(TournamentDto tournament);
+        IEnumerable<PlayerDto> GetPlayersByName(string playerName);
+        PlayerDto GetPlayerById(string playerId);
+        string AddEditTeam(string teamName);
+        void AssignTeam(string tournamentId, TeamDto team);
+        string AddEditPlayer(string playerName);
+        void AssignPlayer(PlayerDto player);
+        string AddMatch(string tournamentId, Match match);
         void AddMatchScore(string tournamentId, string matchId, string teamId, string playerId);
-        IEnumerable<Team> GetTeamsByTournament(string tournamentId);
+        IEnumerable<TeamDto> GetTeamsByTournament(string tournamentId);
         int GetTotalTeamsByTournament(string tournamentId);
-        IEnumerable<Player> GetPlayersByTeam(string tournamentId, string teamId);
+        IEnumerable<PlayerDto> GetPlayersByTeam(string tournamentId, string teamId);
         int GetTotalPlayerByTeam(string tournamentId, string teamId);
         IEnumerable<Match> GetMatches(string tournamentId);
          */

@@ -79,21 +79,19 @@ namespace FutsalManager.Domain.Test
                     MaxPlayerPerTeam = 6,
                     TotalTeam = 4                    
                 });
-
-
-
+            
             A.CallTo(() => tournamentRepo.GetTeamsByTournament(tournamentIdA))
-                .Returns(new List<Team>
+                .Returns(new List<TeamDto>
                 {
-                    blue,
-                    white
+                    blue.ConvertToDto(),
+                    white.ConvertToDto()
                 });
 
             A.CallTo(() => tournamentRepo.GetTeamsByTournament("2"))
-                .Returns(new List<Team>
+                .Returns(new List<TeamDto>
                 {
-                    blue,
-                    white
+                    blue.ConvertToDto(),
+                    white.ConvertToDto()
                 });
 
             A.CallTo(() => tournamentRepo.GetTotalTeamsByTournament(tournamentIdA))
@@ -103,9 +101,9 @@ namespace FutsalManager.Domain.Test
                 .Returns(3);
 
             A.CallTo(() => tournamentRepo.GetMatches(tournamentIdA))
-                .Returns(new List<Match>
+                .Returns(new List<MatchDto>
                 {
-                    match
+                    match.ConvertToDto()
                 });
 
             A.CallTo(() => tournamentRepo.GetPlayersByTeam(tournamentIdA, teamBlueId))
@@ -188,7 +186,7 @@ namespace FutsalManager.Domain.Test
         [TestMethod, ExpectedException(typeof(TeamNotFoundException))]
         public void CreateMatch_TeamNotFound_ThrowsException()
         {            
-            tournamentService.AddMatch(tournamentA, blue, new Team("White"));
+            tournamentService.AddMatch(tournamentA, blue, new Team("Grey"));
         }
 
         [TestMethod]

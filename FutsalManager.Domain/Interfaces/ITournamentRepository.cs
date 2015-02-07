@@ -15,15 +15,16 @@ namespace FutsalManager.Domain.Interfaces
         string Add(TournamentDto tournament);
         IEnumerable<PlayerDto> GetPlayersByName(string playerName);
         PlayerDto GetPlayerById(string playerId);
-        string AddTeam(string tournamentId, Team team);
-        string AddPlayer(string playerName);
-        string AssignPlayer(PlayerDto player);
-        string AddMatch(string tournamentId, Match match);
-        void AddMatchScore(string tournamentId, string matchId, string teamId, string playerId);
-        IEnumerable<Team> GetTeamsByTournament(string tournamentId);
+        string AddEditTeam(TeamDto team);
+        void AssignTeam(string tournamentId, TeamDto team);
+        string AddEditPlayer(PlayerDto player);
+        void AssignPlayer(PlayerDto player);
+        string AddMatch(string tournamentId, MatchDto match);
+        void AddMatchScore(string tournamentId, string matchId, string teamId, string playerId, string remark);
+        IEnumerable<TeamDto> GetTeamsByTournament(string tournamentId);
         int GetTotalTeamsByTournament(string tournamentId);
         IEnumerable<PlayerDto> GetPlayersByTeam(string tournamentId, string teamId);
         int GetTotalPlayerByTeam(string tournamentId, string teamId);
-        IEnumerable<Match> GetMatches(string tournamentId);
+        IEnumerable<MatchDto> GetMatches(string tournamentId);
     }
 }

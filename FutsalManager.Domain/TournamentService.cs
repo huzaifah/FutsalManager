@@ -26,22 +26,21 @@ namespace FutsalManager.Domain
             return tournamentId;
         }
 
-        public string AddTeam(Tournament tournament, Team team)
+        public void AddTeam(Tournament tournament, Team team)
         {
             var teamCount = tournamentRepo.GetTotalTeamsByTournament(tournament.Id);
 
             if (teamCount >= tournament.TotalTeam)
                 throw new ExceedTotalTeamsException();
                         
-            var teamId = tournamentRepo.AddTeam(tournament.Id, team);
-            return teamId;
+            tournamentRepo.AssignTeam(tournament.Id, team.ConvertToDto());            
         }
 
         public void AssignPlayer(Tournament tournament, Team team, Player player)
         {
             var teamList = RetrieveTeams(tournament);
 
-            if (!teamList.Contains(team))
+            if (teamList.SingleOrDefault(t => t.Name == team.Name) == null)
                 throw new TeamNotFoundException();
 
             tournamentRepo.AssignPlayer(player.ConvertToDto());
@@ -51,12 +50,16 @@ namespace FutsalManager.Domain
         {
             var teamList = RetrieveTeams(tournament);
 
-            if (!teamList.Contains(home) || !teamList.Contains(away))
+            //var matchTeam = from t in teamList
+            //            where t.Name == home.Name || t.Name == away.Name
+            //            select t;
+
+            if (teamList.Where(t => t.Name == home.Name || t.Name == away.Name).Count() != 2)
                 throw new TeamNotFoundException();
 
             var match = new Match(home, away);
                         
-            var matchId = tournamentRepo.AddMatch(tournament.Id, match);
+            var matchId = tournamentRepo.AddMatch(tournament.Id, match.ConvertToDto());
             return matchId;
         }
 
@@ -69,7 +72,7 @@ namespace FutsalManager.Domain
                 teamList.FirstOrDefault(x => x.Name == match.AwayTeam.Name)!=null)
                 throw new TeamNotFoundException();
 
-            var matchId = tournamentRepo.AddMatch(tournament.Id, match);
+            var matchId = tournamentRepo.AddMatch(tournament.Id, match.ConvertToDto());
             return matchId;
         }
 
@@ -99,7 +102,7 @@ namespace FutsalManager.Domain
                 else
                     player = tournamentRepo.GetPlayerById(playerId);
 
-            tournamentRepo.AddMatchScore(tournament.Id, match.Id, scoredTeam.Id, player.Id);
+            tournamentRepo.AddMatchScore(tournament.Id, match.Id, scoredTeam.Id, player.Id, remark);
         }
 
         public IEnumerable<Player> RetrievePlayers(Tournament tournament, Team team)
@@ -110,12 +113,14 @@ namespace FutsalManager.Domain
 
         public IEnumerable<Match> RetrieveMatches(Tournament tournament)
         {
-            return tournamentRepo.GetMatches(tournament.Id);
+            var tournaments = tournamentRepo.GetMatches(tournament.Id);
+            return tournaments.ToList().ConvertAll(t => t.ConvertToEntity());
         }
 
         public IEnumerable<Team> RetrieveTeams(Tournament tournament)
         {
-            return tournamentRepo.GetTeamsByTournament(tournament.Id);
+            var teamList = tournamentRepo.GetTeamsByTournament(tournament.Id);
+            return teamList.ToList().ConvertAll(t => t.ConvertToEntity());
         }
 
     }

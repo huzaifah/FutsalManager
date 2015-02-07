@@ -53,5 +53,49 @@ namespace FutsalManager.Domain.Helpers
                 TournamentId = player.TournamentId
             };
         }
+
+        public static TeamDto ConvertToDto(this Team team)
+        {
+            return new TeamDto
+            {
+                Id = team.Id,
+                Name = team.Name,
+                TournamentId = team.TournamentId
+            };
+        }
+
+        public static Team ConvertToEntity(this TeamDto team)
+        {
+            return new Team
+            {
+                Id = team.Id,
+                Name = team.Name,
+                TournamentId = team.TournamentId
+            };
+        }
+
+        public static MatchDto ConvertToDto(this Match match)
+        {
+            return new MatchDto
+            {
+                Id = match.Id,
+                HomeTeam = match.HomeTeam.ConvertToDto(),
+                AwayTeam = match.AwayTeam.ConvertToDto(),
+                IsCompleted = match.IsCompleted,
+                TournamentId = match.TournamentId
+            };
+        }
+
+        public static Match ConvertToEntity(this MatchDto match)
+        {
+            return new Match
+            {
+                Id = match.Id,
+                HomeTeam = match.HomeTeam.ConvertToEntity(),
+                AwayTeam = match.AwayTeam.ConvertToEntity(),
+                IsCompleted = match.IsCompleted,
+                TournamentId = match.TournamentId
+            };
+        }
     }
 }

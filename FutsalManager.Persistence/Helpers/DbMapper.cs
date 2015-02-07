@@ -56,5 +56,61 @@ namespace FutsalManager.Persistence.Helpers
                 //TournamentId = player.TournamentId
             };
         }
+
+        public static TeamDto ConvertToDto(this Teams team)
+        {
+            if (team == null)
+                return default(TeamDto);
+
+            return new TeamDto
+            {
+                Id = team.Id.ToString(),
+                Name = team.Name
+            };
+        }
+
+        public static Teams ConvertToDb(this TeamDto team)
+        {
+            Guid teamGuid;
+
+            if (!Guid.TryParse(team.Id, out teamGuid))
+                throw new ArgumentException("Team id is invalid");
+
+            return new Teams
+            {
+                Id = teamGuid,
+                Name = team.Name                
+            };
+        }
+
+        public static MatchDto ConvertToDto(this Matchs match)
+        {
+            return new MatchDto
+            {
+                Id = match.Id.ToString(),
+                IsCompleted = match.IsCompleted,
+                TournamentId = match.TournamentId.ToString(),
+                HomeTeam = new TeamDto { Id = match.HomeTeam.ToString() },
+                AwayTeam = new TeamDto { Id = match.AwayTeam.ToString() },
+            };
+        }
+
+        public static Matchs ConvertToDb(this MatchDto match)
+        {
+            Guid matchGuid, tournamentGuid, homeTeamGuid, awayTeamGuid;
+
+            if (!Guid.TryParse(match.Id, out matchGuid) || !Guid.TryParse(match.TournamentId, out tournamentGuid)
+                || !Guid.TryParse(match.HomeTeam.Id, out homeTeamGuid) || !Guid.TryParse(match.AwayTeam.Id, out awayTeamGuid))
+                throw new ArgumentException("Match / Tournament / Team id is invalid");
+            
+            return new Matchs
+            {
+                Id = matchGuid,
+                IsCompleted = match.IsCompleted,
+                TournamentId = tournamentGuid,
+                HomeTeam = homeTeamGuid,
+                AwayTeam = awayTeamGuid,
+            };
+        }
     }
 }
