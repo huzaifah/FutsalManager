@@ -12,12 +12,13 @@ namespace FutsalManager.Domain.Interfaces
     {
         IEnumerable<TournamentDto> GetAll();
         TournamentDto GetByDate(DateTime tournamentDate);
-        void Add(TournamentDto tournament);
-        PlayerDto GetPlayerByName(string playerName);
+        string Add(TournamentDto tournament);
+        IEnumerable<PlayerDto> GetPlayersByName(string playerName);
         PlayerDto GetPlayerById(string playerId);
-        void AddTeam(string tournamentId, Team team);
-        void AddPlayer(string tournamentId, string teamId, PlayerDto player);
-        void AddMatch(string tournamentId, Match match);
+        string AddTeam(string tournamentId, Team team);
+        string AddPlayer(string playerName);
+        string AssignPlayer(PlayerDto player);
+        string AddMatch(string tournamentId, Match match);
         void AddMatchScore(string tournamentId, string matchId, string teamId, string playerId);
         IEnumerable<Team> GetTeamsByTournament(string tournamentId);
         int GetTotalTeamsByTournament(string tournamentId);

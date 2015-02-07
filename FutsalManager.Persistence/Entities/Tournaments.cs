@@ -7,10 +7,10 @@ using System.Threading.Tasks;
 
 namespace FutsalManager.Persistence.Entities
 {
-    public class Tournament
+    public class Tournaments
     {
         [PrimaryKey]
-        public string Id { get; set; }
+        public Guid Id { get; set; }
         public DateTime Date { get; set; }
         public int TotalTeam { get; set; }
         public int MaxPlayerPerTeam { get; set; }

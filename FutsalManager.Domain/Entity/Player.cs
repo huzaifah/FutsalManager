@@ -22,5 +22,12 @@ namespace FutsalManager.Domain.Entity
         {
             Name = name;
         }
+
+        public Player(string name, string teamId, string tournamentId)
+        {
+            Name = name;
+            TeamId = teamId;
+            TournamentId = tournamentId;
+        }
     }
 }

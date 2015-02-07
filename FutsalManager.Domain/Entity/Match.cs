@@ -27,6 +27,8 @@ namespace FutsalManager.Domain.Entity
         }
         */
 
+        public Match() { }
+
         public Match(Team home, Team away)
         {
             HomeTeam = home;

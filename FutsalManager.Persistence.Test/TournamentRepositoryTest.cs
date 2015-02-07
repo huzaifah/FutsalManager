@@ -5,6 +5,7 @@ using FutsalManager.Persistence;
 using System.IO;
 using System.Collections.Generic;
 using FutsalManager.Persistence.Entities;
+using FutsalManager.Domain.Dtos;
 
 namespace FutsalManager.Domain.Test
 {
@@ -30,7 +31,7 @@ namespace FutsalManager.Domain.Test
         {
             var tournamentList = tournamentRepository.GetAll();
 
-            Assert.IsInstanceOfType(tournamentList, typeof(List<Tournament>));
+            Assert.IsInstanceOfType(tournamentList, typeof(List<TournamentDto>));
         }
 
         [TestMethod]
@@ -43,7 +44,7 @@ namespace FutsalManager.Domain.Test
         [TestMethod]
         public void AddTournament_ValidTournament_SavedTournament()
         {
-            var tournament = new Tournament
+            var tournament = new TournamentDto
                 {
                     Date = new DateTime(2015, 2, 1),
                     MaxPlayerPerTeam = 6,
@@ -53,6 +54,26 @@ namespace FutsalManager.Domain.Test
             tournament.Id = Guid.NewGuid().ToString();
 
             tournamentRepository.Add(tournament);
+        }
+
+        [TestMethod]
+        public void AssignPlayer_NewPlayer_SavePlayerPlayerAssignments()
+        {
+            var playerDto = new PlayerDto
+            {
+                Id = Guid.NewGuid().ToString(),
+                Name = "Nathan",
+                TeamId = Guid.NewGuid().ToString(),
+                TournamentId = Guid.NewGuid().ToString()
+            };
+
+            tournamentRepository.AssignPlayer(playerDto);
+        }
+
+        [TestMethod]
+        public void GetPlayerByName_ReturnPlayerList()
+        {
+            var playerList = tournamentRepository.GetPlayersByName("Ali");
         }
     }
 }

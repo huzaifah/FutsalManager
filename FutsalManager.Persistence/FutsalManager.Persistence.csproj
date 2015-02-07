@@ -45,7 +45,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Entities\Tournament.cs" />
+    <Compile Include="Entities\PlayerAssignments.cs" />
+    <Compile Include="Entities\Players.cs" />
+    <Compile Include="Entities\Tournaments.cs" />
     <Compile Include="Helpers\DbMapper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TournamentRepository.cs" />
