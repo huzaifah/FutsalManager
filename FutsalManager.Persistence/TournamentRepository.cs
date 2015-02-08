@@ -26,6 +26,10 @@ namespace FutsalManager.Persistence
             db.CreateTable<Tournaments>();
             db.CreateTable<Players>();
             db.CreateTable<PlayerAssignments>();
+            db.CreateTable<Teams>();
+            db.CreateTable<TeamAssignments>();
+            db.CreateTable<Matchs>();
+            db.CreateTable<Scores>();
         }
 
         public IEnumerable<TournamentDto> GetAll()
@@ -61,7 +65,7 @@ namespace FutsalManager.Persistence
             if (!Guid.TryParse(playerId, out playerGuid))
                 throw new ArgumentException("Player id is invalid");
             
-            var player = db.Table<Players>().Where(p => p.Id == playerGuid).Single();
+            var player = db.Table<Players>().Where(p => p.Id == playerGuid).SingleOrDefault();
             return player.ConvertToDto();
         }
 
@@ -209,6 +213,8 @@ namespace FutsalManager.Persistence
 
             if (String.IsNullOrEmpty(match.Id))
                 matchToSave.Id = Guid.NewGuid();
+
+            matchToSave.TournamentId = Guid.Parse(tournamentId);
 
             db.Insert(matchToSave, typeof(Matchs));
 

@@ -97,11 +97,18 @@ namespace FutsalManager.Persistence.Helpers
 
         public static Matchs ConvertToDb(this MatchDto match)
         {
-            Guid matchGuid, tournamentGuid, homeTeamGuid, awayTeamGuid;
+            Guid matchGuid = Guid.Empty, tournamentGuid = Guid.Empty, homeTeamGuid, awayTeamGuid;
 
-            if (!Guid.TryParse(match.Id, out matchGuid) || !Guid.TryParse(match.TournamentId, out tournamentGuid)
-                || !Guid.TryParse(match.HomeTeam.Id, out homeTeamGuid) || !Guid.TryParse(match.AwayTeam.Id, out awayTeamGuid))
-                throw new ArgumentException("Match / Tournament / Team id is invalid");
+            if (!String.IsNullOrEmpty(match.Id))
+                if (!Guid.TryParse(match.Id, out matchGuid))
+                    throw new ArgumentException("Match id is invalid");
+
+            if (!String.IsNullOrEmpty(match.TournamentId))
+                if (!Guid.TryParse(match.TournamentId, out tournamentGuid))
+                    throw new ArgumentException("Tournament id is invalid");     
+                
+            if (!Guid.TryParse(match.HomeTeam.Id, out homeTeamGuid) || !Guid.TryParse(match.AwayTeam.Id, out awayTeamGuid))
+                throw new ArgumentException("Team id is invalid");
             
             return new Matchs
             {
